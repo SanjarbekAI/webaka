@@ -1,4 +1,5 @@
 from parse import parse
+import inspect
 from webob import Request, Response
 
 
@@ -12,8 +13,7 @@ class WebAka:
         return response(environ, start_response)
 
     def route(self, path):
-        if path in self.routes.keys():
-            raise AssertionError("Duplicate route error. Please change the URL.")
+        assert path not in self.routes, "Duplicate route error. Please change the URL."
 
         def wrapper(handler):
             self.routes[path] = handler
@@ -26,7 +26,15 @@ class WebAka:
         handler, kwargs = self.find_handler(request)
 
         if handler is not None:
-            handler(request, response, **kwargs)
+            if inspect.isclass(handler):
+                handler_method = getattr(handler(), request.method.lower(), None)
+                if handler_method is None:
+                    response.status_code = 405
+                    response.text = "Method Not Allowed"
+                    return response
+                handler_method(request, response, **kwargs)
+            else:
+                handler(request, response, **kwargs)
         else:
             self.default_response(response)
 

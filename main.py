@@ -12,6 +12,16 @@ def home(request, response):
 def about(request, response):
     response.text = "Hello from the About Page"
 
+
 @app.route('/hello/{name}')
 def greetings(request, response, name):
     response.text = f"Hello {name}"
+
+
+@app.route('/books')
+class Books:
+    def get(self, request, response):
+        response.text = "Get method from class"
+
+    def post(self, request, response):
+        response.text = "Post method from class"
