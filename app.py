@@ -27,14 +27,13 @@ class WebAka:
 
         if handler is not None:
             if inspect.isclass(handler):
-                handler_method = getattr(handler(), request.method.lower(), None)
-                if handler_method is None:
+                handler = getattr(handler(), request.method.lower(), None)
+                if handler is None:
                     response.status_code = 405
                     response.text = "Method Not Allowed"
                     return response
-                handler_method(request, response, **kwargs)
-            else:
-                handler(request, response, **kwargs)
+
+            handler(request, response, **kwargs)
         else:
             self.default_response(response)
 
