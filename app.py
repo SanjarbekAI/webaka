@@ -12,6 +12,9 @@ class WebAka:
         return response(environ, start_response)
 
     def route(self, path):
+        if path in self.routes.keys():
+            raise AssertionError("Duplicate route error. Please change the URL.")
+
         def wrapper(handler):
             self.routes[path] = handler
             return handler
