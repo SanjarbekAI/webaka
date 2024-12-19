@@ -1,5 +1,7 @@
 import inspect
 
+import requests
+import wsgiadapter
 from parse import parse
 from webob import Request, Response
 
@@ -50,3 +52,8 @@ class WebAka:
     def default_response(self, response):
         response.status_code = 404
         response.text = "Not Found"
+
+    def test_session(self):
+        session = requests.Session()
+        session.mount("http://testserver", wsgiadapter.WSGIAdapter(self))
+        return session
