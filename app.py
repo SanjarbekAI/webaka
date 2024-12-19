@@ -1,5 +1,6 @@
-from parse import parse
 import inspect
+
+from parse import parse
 from webob import Request, Response
 
 
