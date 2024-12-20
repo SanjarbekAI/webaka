@@ -25,3 +25,7 @@ class Books:
 
     def post(self, request, response):
         response.text = "Post method from class"
+
+
+def new_handler(req, resp):
+    resp.text = "From new handler"
