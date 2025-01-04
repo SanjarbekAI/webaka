@@ -29,3 +29,14 @@ class Books:
 
 def new_handler(req, resp):
     resp.text = "From new handler"
+
+
+@app.route('/template')
+def template_handler(req, resp):
+    resp.body = app.template(
+        'home.html',
+        context={
+            "new_title": "New title",
+            "new_body": "New body"
+        }
+    )

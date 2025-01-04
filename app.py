@@ -1,14 +1,19 @@
 import inspect
+import os.path
 
 import requests
 import wsgiadapter
 from parse import parse
 from webob import Request, Response
+from jinja2 import Environment, FileSystemLoader
 
 
 class WebAka:
-    def __init__(self):
+    def __init__(self, templates_dir="templates"):
         self.routes = dict()
+        self.template_env = Environment(
+            loader=FileSystemLoader(os.path.abspath(templates_dir))
+        )
 
     def __call__(self, environ, start_response):
         request = Request(environ)
@@ -59,3 +64,9 @@ class WebAka:
         session = requests.Session()
         session.mount("http://testserver", wsgiadapter.WSGIAdapter(self))
         return session
+
+    def template(self, template_name, context=None):
+        if context is None:
+            context = dict()
+
+        return self.template_env.get_template(template_name).render(**context).encode()
