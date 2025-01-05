@@ -3,9 +3,9 @@ import os.path
 
 import requests
 import wsgiadapter
+from jinja2 import Environment, FileSystemLoader
 from parse import parse
 from webob import Request, Response
-from jinja2 import Environment, FileSystemLoader
 
 
 class WebAka:
@@ -14,6 +14,7 @@ class WebAka:
         self.template_env = Environment(
             loader=FileSystemLoader(os.path.abspath(templates_dir))
         )
+        self.exception_handler = None
 
     def __call__(self, environ, start_response):
         request = Request(environ)
@@ -42,8 +43,13 @@ class WebAka:
                     response.status_code = 405
                     response.text = "Method Not Allowed"
                     return response
-
-            handler(request, response, **kwargs)
+            try:
+                handler(request, response, **kwargs)
+            except Exception as e:
+                if self.exception_handler is not None:
+                    self.exception_handler(request, response, e)
+                else:
+                    raise e
         else:
             self.default_response(response)
 
@@ -70,3 +76,6 @@ class WebAka:
             context = dict()
 
         return self.template_env.get_template(template_name).render(**context).encode()
+
+    def add_exception_handler(self, handler):
+        self.exception_handler = handler

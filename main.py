@@ -40,3 +40,15 @@ def template_handler(req, resp):
             "new_body": "New body"
         }
     )
+
+
+def on_exception(req, resp, exc):
+    resp.text = str(exc)
+
+
+app.add_exception_handler(on_exception)
+
+
+@app.route('/exception')
+def exception_throwing_handler(req, resp):
+    raise AssertionError("some exception")
