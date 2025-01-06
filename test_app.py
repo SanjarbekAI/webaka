@@ -99,6 +99,7 @@ def test_template_handler(app, test_client):
         assert "New body" in response.text
         assert "text/html" in response.headers['Content-Type']
 
+
 def test_custom_exception_handler(app, test_client):
     def on_exception(req, resp, exc):
         resp.text = "something bad happen"
@@ -112,3 +113,12 @@ def test_custom_exception_handler(app, test_client):
     response = test_client.get('http://testserver/exception')
 
     assert response.text == "something bad happen"
+
+
+def test_non_existent_static_file(test_client):
+    assert test_client.get('http://testserver/nonexisten.css').status_code == 404
+
+
+def test_serving_static_file(test_client):
+    response = test_client.get('http://testserver/test.css')
+    assert response.text == "body {background-color: #2272c0}"

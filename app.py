@@ -6,17 +6,22 @@ import wsgiadapter
 from jinja2 import Environment, FileSystemLoader
 from parse import parse
 from webob import Request, Response
+from whitenoise import WhiteNoise
 
 
 class WebAka:
-    def __init__(self, templates_dir="templates"):
+    def __init__(self, templates_dir="templates", static_dor="static"):
         self.routes = dict()
         self.template_env = Environment(
             loader=FileSystemLoader(os.path.abspath(templates_dir))
         )
         self.exception_handler = None
+        self.whitenoise = WhiteNoise(self.wsgi_app, root=static_dor)
 
     def __call__(self, environ, start_response):
+        return self.whitenoise(environ, start_response)
+
+    def wsgi_app(self, environ, start_response):
         request = Request(environ)
         response = self.handle_request(request)
         return response(environ, start_response)
